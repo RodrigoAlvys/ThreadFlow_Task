@@ -1,9 +1,9 @@
 # Documento De Requisitos Do Produto
-**Versão do documento:** 1.0
-**Nome do projeto:** ThreadFlow_Task
-**Público alvo:** Programadores, Agents Autônomos e empresas de tecnologia
-**Proposta de valor:** Programa CLI que organiza tarefas dependentes em ordem topológica com detecção para *deadloop[^2]*
-**Descrição:** Programa CLI que receberá uma lista de tarefas dependentes, seja em .txt ou .json, construindo uma árvore de dependências, retornando erro em caso de *deadloop[^2]* e exportando um arquivo .txt ou .json
+**Versão do documento:** 1.0  
+**Nome do projeto:** ThreadFlow_Task  
+**Público alvo:** Programadores, Agents Autônomos e empresas de tecnologia  
+**Proposta de valor:** Programa CLI que organiza tarefas dependentes em ordem topológica com detecção para *deadloop[^2]*  
+**Descrição:** Programa CLI que receberá uma lista de tarefas dependentes, seja em `.txt` ou `.json`, construindo uma árvore de dependências, retornando erro em caso de *deadloop[^2]* e exportando um   arquivo `.txt` ou `.json`
 
 ---
 
@@ -20,8 +20,8 @@
 ### Dentro Do Escopo
 - Organizar tarefas com menor dependências para o maior, topológica
 - Detectar *deadloop[^2]*
-- Importar arquivo .txt ou .json para receber listas de tarefas
-- Exportar arquivo .txt. ou .json com lista ordenada.
+- Importar arquivo `.txt` ou `.json` para receber listas de tarefas
+- Exportar arquivo `.txt`. ou `.json` com lista ordenada.
 - Interface CLI
 - Comando via terminal
 
@@ -46,8 +46,8 @@
 
 ## Requisitos
 ### Requisitos Funcionais
-- **RF-01:** Leitura de arquivo .txt e .json
-- **RF-02:** Retornar resultado em .txt ou json
+- **RF-01:** Leitura de arquivo `.txt` e `.json`
+- **RF-02:** Retornar resultado em `.txt` ou` json`
 - **RF-03:** Construir árvore de requisitos
 - **RF-04:** Detectar *deadloop[^2]*
 - **RF-05:** Menu CLI
@@ -57,6 +57,7 @@
 - **RF-09:** Mostrar informações básicas específica de uma task
 - **RF-10:** Procurar task através de id ou nome
 - **RF-11:** Funcionalidade com retorno em string da árvore de requisitos
+- **RF-12:** Retorna Ordem topológica para execução das tasks
 
 ### Requisitos Não Funcionais
 - Deve funcionar em sistema operacionais windows e unix
@@ -76,6 +77,7 @@
 - [ ] **CA-09:** O sistema mostra informações resumidas da árvore: número de tasks, número de dependências, task com mais dependências e task mais requisitada
 - [ ] **CA-10:** O sistema mostra informações detalhadas de uma task específica
 - [ ] **CA-11:** O sistema permite buscar uma task por `id` ou `nome` e retorna seus dados
+- [ ] **CA-12:** O sistema deve retorna ordem topológica de forma a executar todas as tasks sem error de dependências
 
 [^1]: Biblioteca de estrutura de dados pensando em grafos e visualização,[**link**](https://networkx.org/documentation/stable/index.html#) oficial do site.
 [^2]: *Deadloop* são dependências cíclicas que ocorrem quando dois ou mais processos ficam bloqueados indefinidamente por dependerem mutuamente dos recursos que o outro possui, gerando um impasse.
