@@ -56,7 +56,7 @@
 - **RF-08:** Mostrar informações básicas e pertinentes da árvore, exemplo: números de tasks, números de dependência, task com mais dependências e task mais requisitada
 - **RF-09:** Mostrar informações básicas específica de uma task
 - **RF-10:** Procurar task através de id ou nome
-- **RF-11:** Funcionalidade com retorno em string da árvore de requisitos
+- **RF-11:** Funcionalidade com retorno em json_string da árvore de requisitos
 - **RF-12:** Retorna Ordem topológica para execução das tasks
 
 ### Requisitos Não Funcionais

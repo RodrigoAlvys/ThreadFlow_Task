@@ -1,7 +1,3 @@
----
-title: "RF-01: Leitura de arquivos"
----
-
 # Leitura de arquivo `.txt` e `.json`
 **ID:** RF-01  
 **Responsável:** Luiz Arthur  

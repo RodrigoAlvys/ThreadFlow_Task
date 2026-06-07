@@ -1,20 +1,43 @@
+name: Issue to Markdown
+
 on:
   issues:
-    types:
-      - labeled
-      - edited
+    types: [labeled]
 
 jobs:
-  issue_to_markdown:
+  convert:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v4
         with:
           token: ${{ secrets.PERSONAL_ACCESS_TOKEN }}
-      - uses: eunjae-lee/issue-to-markdown@v1
-        with:
-          token: ${{ secrets.PERSONAL_ACCESS_TOKEN }}
-          dest: 'doc/requisitos'
-      - uses: stefanzweifel/git-auto-commit-action@v4
-        with:
-          commit_message: 'docs: update contents'
+
+      - name: Save issue as markdown
+        env:
+          GH_TOKEN: ${{ secrets.PERSONAL_ACCESS_TOKEN }}
+        run: |
+          # Busca a issue via API
+          RESPONSE=$(curl -s -H "Authorization: Bearer $GH_TOKEN" \
+            -H "Accept: application/vnd.github.v3+json" \
+            "https://api.github.com/repos/${{ github.repository }}/issues/${{ github.event.issue.number }}")
+          
+          # Extrai título e corpo
+          TITLE=$(echo "$RESPONSE" | jq -r '.title')
+          BODY=$(echo "$RESPONSE" | jq -r '.body // ""')
+          
+          # Gera slug
+          SLUG=$(echo "$TITLE" | tr '[:upper:]' '[:lower:]' | sed 's/[^a-z0-9]/-/g' | sed 's/--*/-/g' | sed 's/^-//;s/-$//')
+          
+          # Cria diretório
+          mkdir -p doc/requisitos
+          
+          # Salva o conteúdo
+          printf "%b" "$BODY" > "doc/requisitos/${SLUG}.md"
+          
+      - name: Commit and push
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          git add doc/requisitos/
+          git diff --cached --quiet || git commit -m "docs: issue #${{ github.event.issue.number }}"
+          git push
