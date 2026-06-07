@@ -1,9 +1,9 @@
 # Documento De Requisitos Do Produto
-**Versão do documento:** 1.0
-**Nome do projeto:** ThreadFlow_Task
-**Público alvo:** Programadores, Agents Autônomos e empresas de tecnologia
-**Proposta de valor:** Programa CLI que organiza tarefas dependentes em ordem topológica com detecção para *deadloop[^2]*
-**Descrição:** Programa CLI que receberá uma lista de tarefas dependentes, seja em .txt ou .json, construindo uma árvore de dependências, retornando erro em caso de *deadloop[^2]* e exportando um arquivo .txt ou .json
+**Versão do documento:** 1.0  
+**Nome do projeto:** ThreadFlow_Task  
+**Público alvo:** Programadores, Agents Autônomos e empresas de tecnologia  
+**Proposta de valor:** Programa CLI que organiza tarefas dependentes em ordem topológica com detecção para *deadloop[^2]*  
+**Descrição:** Programa CLI que receberá uma lista de tarefas dependentes, seja em `.txt` ou `.json`, construindo uma árvore de dependências, retornando erro em caso de *deadloop[^2]* e exportando um   arquivo `.txt` ou `.json`
 
 ---
 
@@ -20,8 +20,8 @@
 ### Dentro Do Escopo
 - Organizar tarefas com menor dependências para o maior, topológica
 - Detectar *deadloop[^2]*
-- Importar arquivo .txt ou .json para receber listas de tarefas
-- Exportar arquivo .txt. ou .json com lista ordenada.
+- Importar arquivo `.txt` ou `.json` para receber listas de tarefas
+- Exportar arquivo `.txt`. ou `.json` com lista ordenada.
 - Interface CLI
 - Comando via terminal
 
@@ -46,8 +46,8 @@
 
 ## Requisitos
 ### Requisitos Funcionais
-- **RF-01:** Leitura de arquivo .txt e .json
-- **RF-02:** Retornar resultado em .txt ou json
+- **RF-01:** Leitura de arquivo `.txt` e `.json`
+- **RF-02:** Retornar resultado em `.txt` ou` json`
 - **RF-03:** Construir árvore de requisitos
 - **RF-04:** Detectar *deadloop[^2]*
 - **RF-05:** Menu CLI
