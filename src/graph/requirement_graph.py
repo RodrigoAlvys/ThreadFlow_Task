@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+from collections import deque
 from .task_node import TaskNode
 
 
@@ -49,6 +50,61 @@ class RequirementGraph:
                 "depends_on": [dep.id for dep in node.depends_on]
             })
         return tasks
+
+    def topological_sort(self) -> list[TaskNode]:
+        """
+        Retorna a ordem topológica das tasks usando algoritmo de Kahn.
+        Tasks sem dependências vêm primeiro.
+        Se houver ciclo, retorna lista vazia.
+        Complexidade: O(n + m)
+
+        Returns:
+            list[TaskNode]: Lista de tasks em ordem topológica.
+                           Lista vazia se ciclo for detectado.
+        """
+        # Calcula grau de entrada (quantas dependências cada task tem)
+        indegrees = {node.id: 0 for node in self.all_nodes()}
+        for node in self.all_nodes():
+            for dep in node.depends_on:
+                indegrees[node.id] += 1
+
+        # Fila com tasks que não têm dependências
+        zero_queue = deque()
+        for task_id, count in indegrees.items():
+            if count == 0:
+                zero_queue.append(task_id)
+
+        order_ids = []
+
+        while zero_queue:
+            task_id = zero_queue.popleft()
+            order_ids.append(task_id)
+
+            node = self.get_node(task_id)
+            if node:
+                # Remove as arestas saindo deste nó
+                for dependent in node.required_by:
+                    indegrees[dependent.id] -= 1
+                    if indegrees[dependent.id] == 0:
+                        zero_queue.append(dependent.id)
+
+        # Se não processamos todos os nós, há ciclo
+        if len(order_ids) != len(self):
+            return []
+
+        return [self.get_node(task_id) for task_id in order_ids]
+
+    def get_topological_order_as_ids(self) -> list[int]:
+        """Retorna a ordem topológica como lista de IDs."""
+        return [node.id for node in self.topological_sort()]
+
+    def get_topological_order_as_names(self) -> list[str]:
+        """Retorna a ordem topológica como lista de nomes."""
+        return [node.name for node in self.topological_sort()]
+
+    def has_valid_topological_order(self) -> bool:
+        """Verifica se é possível obter uma ordem topológica válida."""
+        return len(self.topological_sort()) == len(self)
 
     def __len__(self) -> int:
         return len(self.nodes_by_id)
