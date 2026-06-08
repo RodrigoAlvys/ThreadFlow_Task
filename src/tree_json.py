@@ -1,4 +1,5 @@
 import json
+from collections import deque
 
 
 def _dependency_ids(task):
@@ -31,17 +32,18 @@ def _build_graph(tasks):
 
 
 def _topological_order(tasks, children_by_id, dependency_count):
-    task_position = {task["id"]: position for position, task in enumerate(tasks)}
-    pending = [
+    pending = deque(
         task_id
-        for task_id, count in dependency_count.items()
+        for task_id, count in (
+            (task["id"], dependency_count[task["id"]])
+            for task in tasks
+        )
         if count == 0
-    ]
-    pending.sort(key=task_position.get)
+    )
     order = []
 
     while pending:
-        task_id = pending.pop(0)
+        task_id = pending.popleft()
         order.append(task_id)
 
         for child_id in children_by_id[task_id]:
@@ -49,7 +51,6 @@ def _topological_order(tasks, children_by_id, dependency_count):
 
             if dependency_count[child_id] == 0:
                 pending.append(child_id)
-                pending.sort(key=task_position.get)
 
     return order
 
