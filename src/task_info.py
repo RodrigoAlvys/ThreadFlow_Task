@@ -1,6 +1,9 @@
 from __future__ import annotations
 
-from task_search import TASK_NOT_FOUND, TaskSearcher
+try:
+    from .task_search import TASK_NOT_FOUND, TaskSearcher
+except ImportError:
+    from task_search import TASK_NOT_FOUND, TaskSearcher
 
 
 def _dependency_ids(task):
@@ -76,4 +79,4 @@ def format_task_info(tasks, term):
         f"é requisitada por: {_format_task_list(info['required_by'])}",
     ]
     
-    return "\n".join(lines)   )
+    return "\n".join(lines)

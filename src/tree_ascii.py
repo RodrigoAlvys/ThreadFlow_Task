@@ -1,7 +1,11 @@
 from __future__ import annotations
 
 import json
-from tree_json import requirements_tree_to_json
+
+try:
+    from .tree_json import requirements_tree_to_json
+except ImportError:
+    from tree_json import requirements_tree_to_json
 
 
 DEFAULT_MAX_NAME_LENGTH = 40
