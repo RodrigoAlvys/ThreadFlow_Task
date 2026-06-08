@@ -1,11 +1,11 @@
 from __future__ import annotations
 
 import json
-from src.graph.requirement_graph import RequirementGraph
+from src.graph import RequirementGraph
 
 
 def read_txt(file_path: str) -> RequirementGraph:
-    """Lê arquivo .txt e retorna um RequirementGraph."""
+    """Le arquivo .txt e retorna um RequirementGraph."""
     graph = RequirementGraph()
 
     with open(file_path, "r", encoding="utf-8") as file:
@@ -25,15 +25,16 @@ def read_txt(file_path: str) -> RequirementGraph:
             if len(parts) > 2 and parts[2]:
                 dependencies = [int(dep) for dep in parts[2].split(",")]
                 for dep_id in dependencies:
-                    # Garante que o nó da dependência existe
-                    graph.add_task(dep_id, f"Task_{dep_id}")  # nome temporário
+                    # Garante que o no da dependencia existe com nome temporario
+                    # O nome sera atualizado se a task aparecer depois
+                    graph.add_task(dep_id, f"temp_{dep_id}")
                     graph.add_dependency(task_id, dep_id)
 
     return graph
 
 
 def read_json(file_path: str) -> RequirementGraph:
-    """Lê arquivo .json e retorna um RequirementGraph."""
+    """Le arquivo .json e retorna um RequirementGraph."""
     with open(file_path, "r", encoding="utf-8") as file:
         data = json.load(file)
 
@@ -47,8 +48,7 @@ def read_json(file_path: str) -> RequirementGraph:
         graph.add_task(task_id, task_name)
 
         for dep_id in dependencies:
-            # Garante que o nó da dependência existe
-            graph.add_task(dep_id, f"Task_{dep_id}")  # nome temporário
+            graph.add_task(dep_id, f"temp_{dep_id}")
             graph.add_dependency(task_id, dep_id)
 
     return graph
@@ -62,4 +62,4 @@ def load_file(file_path: str) -> RequirementGraph:
     if file_path.endswith(".json"):
         return read_json(file_path)
 
-    raise ValueError("Formato inválido. Utilize .txt ou .json")
+    raise ValueError("Formato invalido. Utilize .txt ou .json")
