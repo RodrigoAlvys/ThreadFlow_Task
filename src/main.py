@@ -6,27 +6,13 @@ import json
 
 sys.path.insert(0, os.path.dirname(__file__))
 
-from file_reader import load_file
-from graph.tree_builder import TreeBuilder
-from tree_stats import get_tree_stats
-from tree_ascii import print_requirements_tree
 
-
-def main():
-    input_file = None
-    output_file = None
-
-    for argument in sys.argv[1:]:
-        if argument.startswith("--if="):
-            input_file = argument[5:]
-        elif argument.startswith("--of="):
-            output_file = argument[5:]
-
-    if input_file is None:
-        print("Uso: threadflow --if=<arquivo_entrada> --of=<arquivo_saida>")
-        print("Exemplo: threadflow --if=tasks.txt --of=saida.json")
-        print("\nFormatos suportados: .txt e .json")
-        return 1
+def run_file_mode(input_file: str, output_file: str = None):
+    """Modo linha de comando: processa arquivo diretamente."""
+    from file_reader import load_file
+    from graph.tree_builder import TreeBuilder
+    from tree_stats import get_tree_stats
+    from tree_ascii import print_requirements_tree
 
     if not os.path.exists(input_file):
         print(f"ERRO: Arquivo '{input_file}' nao encontrado")
@@ -40,7 +26,6 @@ def main():
         tasks_list = graph.to_task_list()
         stats = get_tree_stats(tasks_list)
 
-        # Obtém ordem topológica
         topological_order = builder.get_topological_order()
         has_cycle = len(topological_order) != len(graph)
 
@@ -68,7 +53,6 @@ def main():
         print("="*50)
         print_requirements_tree(tasks_list)
 
-        # Exportacao (RF-02) incluindo ordem topologica
         if output_file:
             print(f"\nExportando para '{output_file}'...")
             
@@ -122,6 +106,38 @@ def main():
         return 1
 
     return 0
+
+
+def run_cli_mode():
+    """Modo interativo: menu CLI."""
+    from cli.menu import main as menu_main
+    menu_main()
+
+
+def main():
+    """Ponto de entrada principal."""
+    input_file = None
+    output_file = None
+
+    for argument in sys.argv[1:]:
+        if argument.startswith("--if="):
+            input_file = argument[5:]
+        elif argument.startswith("--of="):
+            output_file = argument[5:]
+
+    # Se tem --if, executa modo arquivo
+    if input_file:
+        return run_file_mode(input_file, output_file)
+
+    # Se não tem argumentos, executa modo menu
+    if len(sys.argv) == 1:
+        run_cli_mode()
+        return 0
+
+    # Argumentos inválidos
+    print("Uso: threadflow --if=<arquivo_entrada> --of=<arquivo_saida>")
+    print("Ou: threadflow (sem argumentos para modo interativo)")
+    return 1
 
 
 if __name__ == "__main__":
