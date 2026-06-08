@@ -2,6 +2,7 @@ from __future__ import annotations
 
 import sys
 import os
+import json
 
 sys.path.insert(0, os.path.dirname(__file__))
 
@@ -39,6 +40,10 @@ def main():
         tasks_list = graph.to_task_list()
         stats = get_tree_stats(tasks_list)
 
+        # Obtém ordem topológica
+        topological_order = builder.get_topological_order()
+        has_cycle = len(topological_order) != len(graph)
+
         print("\n" + "="*50)
         print("RF-03: ARVORE DE REQUISITOS")
         print("="*50)
@@ -49,27 +54,64 @@ def main():
         print(f"Profundidade maxima da arvore: {builder.get_tree_depth()}")
 
         print("\n" + "="*50)
-        print("VISUALIZACAO ASCII (RF-07)")
+        print("RF-12: ORDEM TOPOLOGICA")
+        print("="*50)
+        if has_cycle:
+            print("ERRO: Deadloop detectado - nao e possivel gerar ordem topologica")
+        else:
+            print("Ordem de execucao (da primeira para a ultima task):")
+            for idx, task in enumerate(topological_order, 1):
+                print(f"  {idx}. [{task.id}] {task.name}")
+
+        print("\n" + "="*50)
+        print("RF-07: VISUALIZACAO ASCII")
         print("="*50)
         print_requirements_tree(tasks_list)
 
+        # Exportacao (RF-02) incluindo ordem topologica
         if output_file:
             print(f"\nExportando para '{output_file}'...")
+            
             if output_file.endswith('.txt'):
                 with open(output_file, 'w', encoding='utf-8') as f:
+                    f.write("# ORDEM TOPOLOGICA\n")
+                    if has_cycle:
+                        f.write("ERRO: Deadloop detectado\n")
+                    else:
+                        for task in topological_order:
+                            f.write(f"{task.id};{task.name}\n")
+                    
+                    f.write("\n# ESTRUTURA COMPLETA\n")
                     for task in tasks_list:
-                        f.write(f"{task['id']};{task['name']};{','.join(map(str, task['depends_on']))}\n")
+                        deps = ','.join(map(str, task['depends_on'])) if task['depends_on'] else ''
+                        f.write(f"{task['id']};{task['name']};{deps}\n")
                 print(f"Exportado para {output_file}")
+                
             elif output_file.endswith('.json'):
-                import json
+                export_data = {
+                    "ordem_topologica": [],
+                    "arvore": tasks_list,
+                    "estatisticas": stats,
+                    "profundidade_maxima": builder.get_tree_depth(),
+                    "tem_ciclo": has_cycle
+                }
+                
+                if not has_cycle:
+                    export_data["ordem_topologica"] = [
+                        {"id": task.id, "name": task.name} for task in topological_order
+                    ]
+                
                 with open(output_file, 'w', encoding='utf-8') as f:
-                    json.dump({"tasks": tasks_list}, f, indent=2, ensure_ascii=False)
+                    json.dump(export_data, f, indent=2, ensure_ascii=False)
                 print(f"Exportado para {output_file}")
             else:
                 print(f"Formato nao suportado: {output_file}")
 
         print("\n" + "="*50)
-        print("Arvore construida com sucesso")
+        if has_cycle:
+            print("ERRO: Deadloop detectado na estrutura")
+        else:
+            print("Arvore construida com sucesso")
         print("="*50)
 
     except ValueError as e:
