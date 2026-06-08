@@ -1,0 +1,29 @@
+{
+    "tasks": [
+        {
+            "id": 1,
+            "name": "Banco de Dados",
+            "depends_on": []
+        },
+        {
+            "id": 2,
+            "name": "API",
+            "depends_on": [1]
+        },
+        {
+            "id": 3,
+            "name": "Frontend",
+            "depends_on": [2]
+        },
+        {
+            "id": 4,
+            "name": "Deploy",
+            "depends_on": [2, 3]
+        },
+        {
+            "id": 5,
+            "name": "Documentacao",
+            "depends_on": [2]
+        }
+    ]
+}
