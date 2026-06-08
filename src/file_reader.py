@@ -1,7 +1,7 @@
 from __future__ import annotations
 
 import json
-from src.graph import RequirementGraph
+from graph import RequirementGraph
 
 
 def read_txt(file_path: str) -> RequirementGraph:
@@ -25,8 +25,6 @@ def read_txt(file_path: str) -> RequirementGraph:
             if len(parts) > 2 and parts[2]:
                 dependencies = [int(dep) for dep in parts[2].split(",")]
                 for dep_id in dependencies:
-                    # Garante que o no da dependencia existe com nome temporario
-                    # O nome sera atualizado se a task aparecer depois
                     graph.add_task(dep_id, f"temp_{dep_id}")
                     graph.add_dependency(task_id, dep_id)
 

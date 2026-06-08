@@ -1,6 +1,7 @@
-import json
+from __future__ import annotations
 
-from .tree_json import requirements_tree_to_json
+import json
+from tree_json import requirements_tree_to_json
 
 
 DEFAULT_MAX_NAME_LENGTH = 40
@@ -20,7 +21,6 @@ def _truncate(text, max_length):
 
 def _task_label(task, max_name_length):
     name = _truncate(task.get("name", ""), max_name_length)
-
     return f"[{task['id']}] {name}"
 
 

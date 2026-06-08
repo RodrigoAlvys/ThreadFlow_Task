@@ -40,9 +40,15 @@ class RequirementGraph:
         return list(self.nodes_by_id.values())
 
     def to_task_list(self) -> list[dict]:
-        """Converte o grafo para lista de dicionários (compatível com código antigo)."""
-        return [node.to_dict() for node in self.all_nodes()]
+        """Converte o grafo para lista de dicionários."""
+        tasks = []
+        for node in self.all_nodes():
+            tasks.append({
+                "id": node.id,
+                "name": node.name,
+                "depends_on": [dep.id for dep in node.depends_on]
+            })
+        return tasks
 
     def __len__(self) -> int:
         return len(self.nodes_by_id)
-
