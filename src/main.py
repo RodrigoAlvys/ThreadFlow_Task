@@ -7,12 +7,8 @@ import json
 sys.path.insert(0, os.path.dirname(__file__))
 
 
-def run_cli_mode():
-    from cli.menu import main as menu_main
-    menu_main()
-
-
 def run_file_mode(input_file: str, output_file: str = None):
+    """Modo linha de comando: processa arquivo diretamente."""
     from file_reader import load_file
     from graph.tree_builder import TreeBuilder
     from tree_stats import get_tree_stats
@@ -31,7 +27,7 @@ def run_file_mode(input_file: str, output_file: str = None):
         stats = get_tree_stats(tasks_list)
 
         topological_order = builder.get_topological_order()
-        has_cycle = len(topological_order) != graph.total_tasks()
+        has_cycle = len(topological_order) != len(graph)
 
         print("\n" + "="*50)
         print("RF-03: ARVORE DE REQUISITOS")
@@ -112,7 +108,14 @@ def run_file_mode(input_file: str, output_file: str = None):
     return 0
 
 
+def run_cli_mode():
+    """Modo interativo: menu CLI."""
+    from cli.menu import main as menu_main
+    menu_main()
+
+
 def main():
+    """Ponto de entrada principal."""
     input_file = None
     output_file = None
 
@@ -122,13 +125,16 @@ def main():
         elif argument.startswith("--of="):
             output_file = argument[5:]
 
-    if input_file is None and len(sys.argv) == 1:
-        run_cli_mode()
-        return 0
-
+    # Se tem --if, executa modo arquivo
     if input_file:
         return run_file_mode(input_file, output_file)
 
+    # Se não tem argumentos, executa modo menu
+    if len(sys.argv) == 1:
+        run_cli_mode()
+        return 0
+
+    # Argumentos inválidos
     print("Uso: threadflow --if=<arquivo_entrada> --of=<arquivo_saida>")
     print("Ou: threadflow (sem argumentos para modo interativo)")
     return 1
