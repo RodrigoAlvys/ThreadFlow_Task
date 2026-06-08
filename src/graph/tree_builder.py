@@ -14,14 +14,14 @@ class TreeBuilder:
         self._built = False
 
     def _validate_no_cycles(self):
-        """Usa o cycle_detector.py existente (Luiz Arthur)."""
+        """Valida que não há dependências circulares usando cycle_detector."""
         tasks_list = self.graph.to_task_list()
         if has_cycle(tasks_list):
             cycle_tasks = self._find_cycle_tasks()
             raise ValueError(f"Deadloop detectado: {' -> '.join(cycle_tasks)}")
 
     def _find_cycle_tasks(self) -> list[str]:
-        """Identifica tasks envolvidas no ciclo."""
+        """Identifica as tasks envolvidas no primeiro ciclo encontrado."""
         visited = set()
         stack = []
 
@@ -79,84 +79,102 @@ class TreeBuilder:
             return
 
         visited.add(node.id)
-        print(f"DEBUG: Visitando node {node.id} - {node.name}")
-        print(f"DEBUG:   depends_on: {[d.id for d in node.depends_on]}")
-        print(f"DEBUG:   required_by: {[r.id for r in node.required_by]}")
 
-        # Os filhos são as tasks que dependem deste nó
         for dependent in node.required_by:
-            print(f"DEBUG:   Adicionando filho {dependent.id} - {dependent.name}")
             node.add_child(dependent)
             self._build_tree_recursive(dependent, visited)
 
     def build(self) -> list[TaskNode]:
-        """Constrói e retorna as raízes da árvore de dependências."""
+        """
+        Constrói e retorna as raízes da árvore de dependências.
+        Complexidade: O(n + m) para detecção de ciclo + O(n log n) para ordenação.
+        """
         if self._built:
             return self.roots
 
         self._validate_no_cycles()
         self._validate_all_dependencies_exist()
 
-        print("\nDEBUG: Todos os nós do grafo:")
-        for node in self.graph.all_nodes():
-            print(f"  ID:{node.id} name:{node.name} depends_on:{[d.id for d in node.depends_on]}")
-
         visited: set[int] = set()
         self.roots = []
 
-        # Encontra todos os nós raiz (não dependem de ninguém)
         for node in self.graph.all_nodes():
             if node.is_root():
                 self.roots.append(node)
 
-        print(f"\nDEBUG: Raizes encontradas: {[r.id for r in self.roots]}")
-
         if not self.roots and len(self.graph) > 0:
             raise ValueError("Ciclo detectado: nenhuma tarefa é independente")
 
-        # Constrói a árvore a partir de cada raiz
         for root in sorted(self.roots, key=lambda x: x.id):
-            print(f"\nDEBUG: Construindo a partir da raiz {root.id} - {root.name}")
             self._build_tree_recursive(root, visited)
 
-        print(f"\nDEBUG: Nós visitados: {visited}")
-        print(f"DEBUG: Total de nós: {len(self.graph)}")
-
-        # Verifica se todos os nós foram visitados
         if len(visited) != len(self.graph):
             unvisited = set(self.graph.nodes_by_id.keys()) - visited
-            unvisited_names = []
-            for uid in unvisited:
-                node = self.graph.get_node(uid)
-                unvisited_names.append(f"{node.name}(ID:{uid})" if node else str(uid))
-            raise ValueError(f"Nos nao conectados as raizes: {unvisited_names}")
+            raise ValueError(f"Nos nao conectados as raizes: {unvisited}")
 
         self._built = True
         return self.roots
 
     def get_roots(self) -> list[TaskNode]:
+        """Retorna as raízes da árvore."""
         if not self._built:
             self.build()
         return self.roots
 
     def get_tree_depth(self) -> int:
+        """Retorna a profundidade máxima da árvore."""
         if not self._built:
             self.build()
         max_depth = max((node.get_depth() for node in self.graph.all_nodes()), default=0)
         return max_depth
 
     def get_parent_of(self, task_id: int) -> TaskNode | None:
+        """Retorna o pai de uma task na árvore."""
         if not self._built:
             self.build()
         node = self.graph.get_node(task_id)
         return node.parent if node else None
 
     def get_children_of(self, task_id: int) -> list[TaskNode]:
+        """Retorna os filhos de uma task na árvore."""
         if not self._built:
             self.build()
         node = self.graph.get_node(task_id)
         return node.children if node else []
 
     def has_cycle(self) -> bool:
+        """Verifica se o grafo contém ciclo."""
         tasks_list = self.graph.to_task_list()
         return has_cycle(tasks_list)
+
+    def print_tree_summary(self) -> str:
+        """Retorna um resumo da árvore para exibição."""
+        if not self._built:
+            self.build()
+
+        lines = []
+        lines.append(f"Total de tasks: {len(self.graph)}")
+        lines.append(f"Tasks raiz: {len(self.roots)}")
+        lines.append(f"Profundidade maxima: {self.get_tree_depth()}")
+
+        if self.roots:
+            lines.append("\nRaizes:")
+            for root in self.roots:
+                lines.append(f"  - [{root.id}] {root.name}")
+
+        return "\n".join(lines)
+
+    def get_topological_order(self) -> list[TaskNode]:
+        """
+        Retorna a ordem topológica das tasks usando o método do grafo.
+        Se houver ciclo, retorna lista vazia e não constrói a árvore.
+        """
+        return self.graph.topological_sort()
+
+    def get_topological_order_as_names(self) -> list[str]:
+        """Retorna a ordem topológica como lista de nomes."""
+        return [node.name for node in self.get_topological_order()]
+
+    def get_topological_order_as_ids(self) -> list[int]:
+        """Retorna a ordem topológica como lista de IDs."""
+        return [node.id for node in self.get_topological_order()]
