@@ -1,6 +1,6 @@
 import unittest
 
-from projeto.task_search import TASK_NOT_FOUND, TaskSearcher, search_task
+from src.task_search import TASK_NOT_FOUND, TaskSearcher, search_task
 
 
 class TaskSearchTest(unittest.TestCase):
