@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 from .task_search import TASK_NOT_FOUND, TaskSearcher, search_task
 from .task_info import format_task_info, get_task_info
 from .tree_ascii import print_requirements_tree, requirements_tree_to_ascii
