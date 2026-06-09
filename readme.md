@@ -65,7 +65,7 @@ ThreadFlow_Task/
 │   ├── tree_json.py
 │   └── tree_stats.py
 │
-├── tests/
+├── data/
 │   ├── generate.py
 │   ├── teste_10000.txt
 │   └── teste_10000.json
