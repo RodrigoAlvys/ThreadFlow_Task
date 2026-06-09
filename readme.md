@@ -494,7 +494,7 @@ Validar o comportamento do sistema sob carga massiva.
 Arquivo gerado automaticamente por:
 
 ```bash
-python tests/generate.py
+python data/generate.py
 ```
 
 Características:
